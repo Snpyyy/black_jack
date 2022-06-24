@@ -24,9 +24,6 @@ class UserTest extends TestCase
         $this->assertSame(3, count($user->drawCard($deck, 1)));
     }
 
-    // public function testGetScore()
-    // {}
-
     public function testCheckScore()
     {
         $user = new User('あなた');

@@ -21,6 +21,16 @@ use BlackJack\GamePlayer\JoinPlayer;
 class Game
 {
     /**
+     * @var User $user
+     */
+    public $user;
+
+    /**
+     * @var Dealer $dealer
+     */
+    public $dealer;
+
+    /**
      * @var int $playerCount
      */
     public $playerCount;
@@ -40,6 +50,21 @@ class Game
      */
     // public $playerScore = 0;
 
+    /**
+     * @var Deck $deck
+     */
+    public $deck;
+
+    /**
+     * @var Display $display
+     */
+    public $display;
+
+    /**
+     * @var TotalScore $totalScore
+     */
+    public $totalScore;
+
     public const FIRST_DRAW_CARD_COUNT = 2;
     public function __construct(int $playerCount)
     {
@@ -48,51 +73,60 @@ class Game
 
     public function start(): void
     {
-        $deck = new Deck();
-        $display = new Display();
-        $user = new User('あなた');
-        $dealer = new Dealer('ディーラー');
+        $this->deck = new Deck();
+        $this->display = new Display();
+        $this->totalScore = new TotalScore();
+        $this->user = new User('あなた');
+        $this->dealer = new Dealer('ディーラー');
         // $cpu = new ComputerPlayer();
 
-        foreach ([$user, $dealer] as $player) {
+        foreach ([$this->user, $this->dealer] as $player) {
             $joinPlayer = new JoinPlayer($player);
-            $drawCards = $joinPlayer->drawCard($deck, self::FIRST_DRAW_CARD_COUNT);
-            $joinPlayer->firstDrawCardView($display, $drawCards);
+            $drawCards = $joinPlayer->drawCard($this->deck, self::FIRST_DRAW_CARD_COUNT);
+            $joinPlayer->firstDrawCardView($this->display, $drawCards);
         }
 
-        $joinPlayer = new JoinPlayer($user);
-        $totalScore = new TotalScore();
-        $this->userScore = $joinPlayer->getScore($totalScore);
+        $this->userTurn();
+        $this->dealerTurn();
+
+        foreach ([$this->user, $this->dealer] as $player) {
+            $joinPlayer = new JoinPlayer($player);
+            $joinPlayer->totalScoreView($this->display);
+        }
+
+        $this->display->judgeView($this->userScore, $this->dealerScore);
+    }
+
+    private function userTurn(): void
+    {
+        $joinPlayer = new JoinPlayer($this->user);
+        $this->userScore = $joinPlayer->getScore($this->totalScore);
 
         while ($joinPlayer->checkScore($this->userScore)) {
-            $joinPlayer->isDrawCardView($display, $this->userScore);
+            $joinPlayer->isDrawCardView($this->display, $this->userScore);
             $stdin = trim(fgets(STDIN));
             if ($stdin === 'Y') {
-                $joinPlayer->drawCard($deck, 1);
-                $joinPlayer->getDrawCardView($display);
-                $this->userScore = $joinPlayer->getScore($totalScore);
+                $joinPlayer->drawCard($this->deck, 1);
+                $joinPlayer->getDrawCardView($this->display);
+                $this->userScore = $joinPlayer->getScore($this->totalScore);
             } elseif ($stdin === 'N') {
                 break;
             } else {
-                $display->generate('YかNで入力してください');
+                $this->display->generate('YかNで入力してください');
             }
         }
+    }
 
-        $joinPlayer = new JoinPlayer($dealer);
-        $dealer->secondDrawCardView($display);
-        $this->dealerScore = $joinPlayer->getScore($totalScore);
+    private function dealerTurn(): void
+    {
+        $joinPlayer = new JoinPlayer($this->dealer);
+        $this->dealer->secondDrawCardView($this->display);
+        $this->dealerScore = $joinPlayer->getScore($this->totalScore);
         while ($joinPlayer->checkScore($this->dealerScore)) {
-            $joinPlayer->totalScoreView($display);
-            $joinPlayer->drawCard($deck, 1);
-            $joinPlayer->getDrawCardView($display);
-            $this->dealerScore = $joinPlayer->getScore($totalScore);
+            $joinPlayer->totalScoreView($this->display);
+            $joinPlayer->drawCard($this->deck, 1);
+            $joinPlayer->getDrawCardView($this->display);
+            $this->dealerScore = $joinPlayer->getScore($this->totalScore);
         }
-
-        foreach ([$user, $dealer] as $player) {
-            $joinPlayer = new JoinPlayer($player);
-            $joinPlayer->totalScoreView($display);
-        }
-
-        $display->judgeView($this->userScore, $this->dealerScore);
     }
 }
