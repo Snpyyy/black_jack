@@ -24,16 +24,6 @@ class DealerTest extends TestCase
         $this->assertSame(3, count($dealer->drawCard($deck, 1)));
     }
 
-    // public function testGetScore()
-    // {
-    //     $dealer = new Dealer('ディーラー');
-    //     $totalScore = new TotalScore();
-
-    //     $this->assertSame(10, $dealer->getScore($totalScore, ['H3', 'D7']));
-    //     $this->assertSame(20, $dealer->getScore($totalScore, ['DJ']));
-    //     $this->assertSame(26, $dealer->getScore($totalScore, ['S6']));
-    // }
-
     public function testFirstDrawCardView()
     {
         $dealer = new Dealer('ディーラー');
