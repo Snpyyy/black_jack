@@ -14,16 +14,22 @@ class Display
      */
     public function firstDrawCardView(array $drawCards, string $name): void
     {
-        if ($name === 'ディーラー') {
-            $card = new Card(substr($drawCards[0], 0, 1), substr($drawCards[0], 1, strlen($drawCards[0]) - 1));
-            echo "{$name}の引いたカードは{$card->getSuit()}の{$card->GetNum()}です。" . PHP_EOL;
-            echo "{$name}の引いた2枚目のカードはわかりません。" . PHP_EOL;
-        } else {
-            foreach ((array)$drawCards as $drawCard) {
-                $card = new Card(substr($drawCard, 0, 1), substr($drawCard, 1, strlen($drawCard) - 1));
-                echo "{$name}の引いたカードは{$card->getSuit()}の{$card->getNum()}です。" . PHP_EOL;
-            }
+        foreach ((array)$drawCards as $drawCard) {
+            $card[] = new Card(substr($drawCard, 0, 1), substr($drawCard, 1, strlen($drawCard) - 1));
         }
+
+        if ($name === 'ディーラー') {
+            $msg = <<<EOD
+            {$name}の引いたカードは{$card[0]->getSuit()}の{$card[0]->GetNum()}です。
+            {$name}の引いた2枚目のカードはわかりません。
+            EOD;
+        } else {
+            $msg = <<<EOD
+            {$name}の引いたカードは{$card[0]->getSuit()}の{$card[0]->getNum()}です。
+            {$name}の引いたカードは{$card[1]->getSuit()}の{$card[1]->getNum()}です。
+            EOD;
+        }
+        $this->generate($msg);
     }
 
     /**
@@ -32,7 +38,8 @@ class Display
      */
     public function isDrawCardView(int $totalScore, string $name): void
     {
-        echo "{$name}の現在の得点は{$totalScore}です。カードを引きますか？(Y/N)" . PHP_EOL;
+        $msg = "{$name}の現在の得点は{$totalScore}です。カードを引きますか？(Y/N)";
+        $this->generate($msg);
     }
 
     /**
@@ -42,7 +49,8 @@ class Display
     public function secondDrawCardView(array $hand, string $name): void
     {
         $card = new Card(substr($hand[1], 0, 1), substr($hand[1], 1, strlen($hand[1]) - 1));
-        echo "{$name}の引いた2枚目のカードは{$card->getSuit()}の{$card->getNum()}でした。" . PHP_EOL;
+        $msg = "{$name}の引いた2枚目のカードは{$card->getSuit()}の{$card->getNum()}でした。";
+        $this->generate($msg);
     }
 
     /**
@@ -51,7 +59,8 @@ class Display
      */
     public function totalScoreView(int $totalScore, string $name): void
     {
-        echo "{$name}の現在の得点は{$totalScore}です。" . PHP_EOL;
+        $msg = "{$name}の現在の得点は{$totalScore}です。";
+        $this->generate($msg);
     }
 
     /**
@@ -60,19 +69,17 @@ class Display
      */
     public function judgeView(int $userScore, int $dealerScore): void
     {
-        if ($userScore > 21 && $dealerScore > 21) {
-            echo '勝負はドローです。' . PHP_EOL;
-        } elseif ($userScore > 21) {
-            echo 'ディーラーの勝ちです。' . PHP_EOL;
-        } elseif ($dealerScore > 21) {
-            echo 'あなたの勝ちです。' . PHP_EOL;
-        } elseif ($userScore === $dealerScore) {
-            echo '勝負は引き分けです。' . PHP_EOL;
-        } elseif ($userScore > $dealerScore) {
-            echo 'あなたの勝ちです。' . PHP_EOL;
-        } else {
-            echo 'ディーラーの勝ちです。' . PHP_EOL;
+        $overScore = $userScore > 21 && $dealerScore > 21;
+        $sameScore = $userScore === $dealerScore;
+        if ($overScore || $sameScore) {
+            $msg  = '勝負は引き分けです。';
+        } elseif ($userScore > 21 || $dealerScore > $userScore) {
+            $msg = 'ディーラーの勝ちです。';
+        } elseif ($dealerScore > 21 || $userScore > $dealerScore) {
+            $msg = 'あなたの勝ちです。';
         }
+
+        $this->generate($msg);
     }
 
     /**
@@ -82,7 +89,9 @@ class Display
     public function getDrawCardView(string $drawCard, string $name): void
     {
         $card = new Card(substr($drawCard, 0, 1), substr($drawCard, 1, strlen($drawCard) - 1));
-        echo "{$name}の引いたカードは{$card->getSuit()}の{$card->getNum()}です。" . PHP_EOL;
+        $msg = "{$name}の引いたカードは{$card->getSuit()}の{$card->getNum()}です。";
+
+        $this->generate($msg);
     }
 
     /**
