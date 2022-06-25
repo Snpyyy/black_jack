@@ -11,7 +11,7 @@ class Card
         'S' => 'スペード'
     ];
     public const CARD_NUMBERS_SCORE = [
-        'A' => 1,
+        'A' => 11,
         '2' => 2,
         '3' => 3,
         '4' => 4,

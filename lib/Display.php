@@ -14,6 +14,7 @@ class Display
      */
     public function firstDrawCardView(array $drawCards, string $name): void
     {
+        $card = [];
         foreach ((array)$drawCards as $drawCard) {
             $card[] = new Card(substr($drawCard, 0, 1), substr($drawCard, 1, strlen($drawCard) - 1));
         }
@@ -69,13 +70,14 @@ class Display
      */
     public function judgeView(int $userScore, int $dealerScore): void
     {
+        $msg = '';
         $overScore = $userScore > 21 && $dealerScore > 21;
         $sameScore = $userScore === $dealerScore;
         if ($overScore || $sameScore) {
             $msg  = '勝負は引き分けです。';
         } elseif ($userScore > 21 || $dealerScore > $userScore) {
             $msg = 'ディーラーの勝ちです。';
-        } elseif ($dealerScore > 21 || $userScore > $dealerScore) {
+        } else {
             $msg = 'あなたの勝ちです。';
         }
 

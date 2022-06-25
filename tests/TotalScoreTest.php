@@ -13,8 +13,8 @@ class TotalScoreTest extends TestCase
     {
         $totalScore = new TotalScore();
 
-        $this->assertSame(20, $totalScore->getScore(['HJ', 'D10']));
-        $this->assertSame(6, $totalScore->getScore(['HA', 'D5']));
+        $this->assertSame(21, $totalScore->getScore(['HJ', 'D10', 'KA']));
+        $this->assertSame(21, $totalScore->getScore(['HA', 'DA', 'SA', 'K3', 'S5']));
         $this->assertSame(20, $totalScore->getScore(['HK', 'DQ']));
     }
 }
